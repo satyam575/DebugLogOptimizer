@@ -1,0 +1,6 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: org.debugBetter.DebugOptimizer
+displayName: Lazify debug log arguments
+description: Wraps non-trivial debug() arguments in () -> expr to avoid eager evaluation when debug is disabled.
+recipeList:
+  - org.debugBetter.DebugOptimizer
