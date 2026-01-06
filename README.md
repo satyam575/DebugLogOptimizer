@@ -62,7 +62,7 @@ Output JAR:
 target/debug-optimizer-0.1.0.jar
 ```
 
-## Use via Maven plugin
+## Use locally via Maven plugin
 
 Install the recipe to your local Maven repo:
 
@@ -102,17 +102,9 @@ You can also configure the plugin in your target project's `pom.xml`:
 </plugin>
 ```
 
-## Use via JitPack (public GitHub)
+## Use prebuilt via JitPack (no local build)
 
-1. Make sure the GitHub repo is public.
-2. Tag a release and push it, for example:
-
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-3. In the target project, add the JitPack repository and dependency:
+If you prefer a prebuilt artifact, use the published JitPack version:
 
 ```xml
 <repositories>
@@ -129,6 +121,51 @@ git push origin v0.1.0
     <version>v0.1.0</version>
   </dependency>
 </dependencies>
+```
+
+If you want to use the Maven plugin, keep JitPack only as a regular repository
+(so the recipe dependency comes from JitPack) and use the plugin from Central:
+
+```xml
+<plugin>
+  <groupId>org.openrewrite.maven</groupId>
+  <artifactId>rewrite-maven-plugin</artifactId>
+  <version>5.44.0</version>
+  <configuration>
+    <activeRecipes>
+      <recipe>org.debugBetter.DebugToFluent</recipe>
+    </activeRecipes>
+  </configuration>
+  <dependencies>
+    <dependency>
+      <groupId>com.github.satyam575</groupId>
+      <artifactId>DebugLogOptimizer</artifactId>
+      <version>v0.1.0</version>
+    </dependency>
+  </dependencies>
+</plugin>
+```
+
+If you want JitPack only when running OpenRewrite, use a profile:
+
+```xml
+<profiles>
+  <profile>
+    <id>rewrite-jitpack</id>
+    <repositories>
+      <repository>
+        <id>jitpack</id>
+        <url>https://jitpack.io</url>
+      </repository>
+    </repositories>
+  </profile>
+</profiles>
+```
+
+Then run:
+
+```
+mvn -Prewrite-jitpack rewrite:run
 ```
 
 Then reference the recipe ID, for example:
