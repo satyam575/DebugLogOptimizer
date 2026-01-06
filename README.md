@@ -80,6 +80,28 @@ mvn -Drewrite.recipeArtifactCoordinates=com.debugBetter:debug-optimizer:0.1.0 ^
 
 Use `rewrite:run` to apply changes.
 
+You can also configure the plugin in your target project's `pom.xml`:
+
+```xml
+<plugin>
+  <groupId>org.openrewrite.maven</groupId>
+  <artifactId>rewrite-maven-plugin</artifactId>
+  <version>5.44.0</version>
+  <configuration>
+    <activeRecipes>
+      <recipe>org.debugBetter.DebugToFluent</recipe>
+    </activeRecipes>
+  </configuration>
+  <dependencies>
+    <dependency>
+      <groupId>com.debugBetter</groupId>
+      <artifactId>debug-optimizer</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+  </dependencies>
+</plugin>
+```
+
 ## Use in IntelliJ (OpenRewrite plugin)
 
 1. Install the OpenRewrite plugin in IntelliJ.
