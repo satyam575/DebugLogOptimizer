@@ -1,16 +1,19 @@
 # DebugLogOptimizer
 
-OpenRewrite recipe that lazifies debug log arguments by wrapping non-trivial
-expressions in a `Supplier` lambda so they are only evaluated when debug logging
-is enabled.
+OpenRewrite recipes for optimizing debug logging. The recipes are split by
+strategy so you can pick the behavior you want.
 
-## What it does
+## Recipes
 
-The recipe targets `debug(...)` calls with two or more arguments (message/template
-plus arguments). It leaves the message argument unchanged and wraps non-trivial
-arguments like method calls or object creation with `() -> expr`.
+### Wrap arguments with Supplier
 
-Examples:
+Recipe: `org.debugBetter.DebugToSupplier`
+
+Targets `debug(...)` calls on loggers that expose `Supplier` overloads (for
+example, Log4j2). It leaves the message argument unchanged and wraps non-trivial
+arguments in `() -> expr`.
+
+Example:
 
 ```java
 log.debug("user {}", getUser());
@@ -22,7 +25,30 @@ becomes:
 log.debug("user {}", () -> getUser());
 ```
 
-Trivial arguments such as identifiers, field access, or literals are left as-is.
+### Guard with isDebugEnabled
+
+Recipe: `org.debugBetter.DebugToGuard`
+
+Targets SLF4J `debug(...)` calls and wraps them in a guard:
+
+```java
+if (log.isDebugEnabled()) {
+    log.debug("debugging: {}", request);
+}
+```
+
+### Convert to SLF4J fluent API
+
+Recipe: `org.debugBetter.DebugToFluent`
+
+Targets SLF4J 2.0+ and rewrites to the fluent API:
+
+```java
+log.atDebug()
+   .setMessage("debugging: {}")
+   .addArgument(request)
+   .log();
+```
 
 ## Build
 
@@ -36,14 +62,32 @@ Output JAR:
 target/debug-optimizer-0.1.0.jar
 ```
 
+## Use via Maven plugin
+
+Install the recipe to your local Maven repo:
+
+```bash
+mvn -DskipTests install
+```
+
+Run on a target project:
+
+```bash
+mvn -Drewrite.recipeArtifactCoordinates=com.debugBetter:debug-optimizer:0.1.0 ^
+    -Drewrite.activeRecipes=org.debugBetter.DebugToSupplier ^
+    org.openrewrite.maven:rewrite-maven-plugin:5.44.0:dryRun
+```
+
+Use `rewrite:run` to apply changes.
+
 ## Use in IntelliJ (OpenRewrite plugin)
 
 1. Install the OpenRewrite plugin in IntelliJ.
-2. Add the built JAR in the OpenRewrite settings.
-3. Run the recipe by name:
+2. Add the built JAR in the OpenRewrite settings (Recipe Sources / Classpath / Add JAR).
+3. Run a recipe by name, for example:
 
 ```
-org.debugBetter.DebugOptimizer
+org.debugBetter.DebugToSupplier
 ```
 
 ## Recipe definition
@@ -54,3 +98,9 @@ The recipe is registered in:
 src/main/resources/META-INF/rewrite/rewrite.yml
 ```
 
+## Notes
+
+- `DebugToSupplier` requires a logger that supports `Supplier` overloads (for example, Log4j2).
+- `DebugToGuard` targets SLF4J and wraps `debug(...)` with `if (logger.isDebugEnabled())`.
+- `DebugToFluent` targets SLF4J 2.0+ and uses `atDebug()`.
+- Type attribution must be available in the target project for logger matching to work.

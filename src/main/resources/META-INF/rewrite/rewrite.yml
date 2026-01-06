@@ -1,6 +1,20 @@
 type: specs.openrewrite.org/v1beta/recipe
-name: org.debugBetter.DebugOptimizer
-displayName: Lazify debug log arguments
-description: Wraps non-trivial debug() arguments in () -> expr to avoid eager evaluation when debug is disabled.
+name: org.debugBetter.DebugToSupplier
+displayName: Wrap debug arguments with Supplier
+description: Wraps non-trivial debug() arguments in Supplier lambdas for loggers that support Supplier overloads.
 recipeList:
-  - org.debugBetter.DebugOptimizer
+  - org.debugBetter.DebugToSupplierRecipe
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.debugBetter.DebugToGuard
+displayName: Guard debug logs with isDebugEnabled
+description: Wraps SLF4J debug() calls with if (logger.isDebugEnabled()) guards.
+recipeList:
+  - org.debugBetter.DebugToGuardRecipe
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.debugBetter.DebugToFluent
+displayName: Convert debug logs to fluent API
+description: Rewrites SLF4J debug() calls to the fluent API when atDebug() is available.
+recipeList:
+  - org.debugBetter.DebugToFluentRecipe
