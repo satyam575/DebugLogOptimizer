@@ -102,5 +102,6 @@ src/main/resources/META-INF/rewrite/rewrite.yml
 
 - `DebugToSupplier` requires a logger that supports `Supplier` overloads (for example, Log4j2).
 - `DebugToGuard` targets SLF4J and wraps `debug(...)` with `if (logger.isDebugEnabled())`.
-- `DebugToFluent` targets SLF4J 2.0+ and uses `atDebug()`.
+- `DebugToFluent` targets SLF4J 2.0+ and uses `atDebug()`. If type attribution is missing, it can also match Lombok `@Slf4j` with the generated `log` field.
 - Type attribution must be available in the target project for logger matching to work.
+- If type attribution is missing, `DebugToGuard` can still match Lombok `@Slf4j` by using the generated `log` field name.

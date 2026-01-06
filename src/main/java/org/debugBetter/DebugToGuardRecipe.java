@@ -51,9 +51,6 @@ public class DebugToGuardRecipe extends Recipe {
                 }
 
                 JavaType.Method methodType = mi.getMethodType();
-                if (methodType == null || !DebugRecipeUtils.isSlf4jLogger(methodType)) {
-                    return s;
-                }
 
                 if (mi.getArguments().size() < 2) {
                     return s;
@@ -61,6 +58,14 @@ public class DebugToGuardRecipe extends Recipe {
 
                 Expression select = mi.getSelect();
                 if (select == null || !DebugRecipeUtils.isSafeLoggerSelect(select)) {
+                    return s;
+                }
+
+                boolean isSlf4j = methodType != null && DebugRecipeUtils.isSlf4jLogger(methodType);
+                boolean isLombokSlf4j = methodType == null
+                        && DebugRecipeUtils.isLombokSlf4jAnnotated(this)
+                        && DebugRecipeUtils.isLombokSlf4jLoggerSelect(select);
+                if (!isSlf4j && !isLombokSlf4j) {
                     return s;
                 }
 

@@ -129,6 +129,32 @@ final class DebugRecipeUtils {
                 || select instanceof J.FieldAccess;
     }
 
+    static boolean isLombokSlf4jAnnotated(JavaIsoVisitor<ExecutionContext> visitor) {
+        Cursor cursor = visitor.getCursor();
+        Cursor parent = cursor.dropParentUntil(p -> p instanceof J.ClassDeclaration);
+        if (!(parent.getValue() instanceof J.ClassDeclaration classDecl)) {
+            return false;
+        }
+
+        for (J.Annotation annotation : classDecl.getAllAnnotations()) {
+            if ("Slf4j".equals(annotation.getSimpleName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static boolean isLombokSlf4jLoggerSelect(Expression select) {
+        if (select instanceof J.Identifier identifier) {
+            return "log".equals(identifier.getSimpleName());
+        }
+        if (select instanceof J.FieldAccess fieldAccess) {
+            return "log".equals(fieldAccess.getSimpleName());
+        }
+        return false;
+    }
+
     static boolean isAlreadyGuarded(JavaIsoVisitor<ExecutionContext> visitor) {
         Cursor cursor = visitor.getCursor();
         Cursor parent = cursor.dropParentUntil(p -> p instanceof J.If);

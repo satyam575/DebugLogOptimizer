@@ -41,19 +41,26 @@ public class DebugToFluentRecipe extends Recipe {
                     return mi;
                 }
 
-                JavaType.Method methodType = mi.getMethodType();
-                if (methodType == null || !DebugRecipeUtils.isSlf4jLogger(methodType)) {
-                    return mi;
-                }
-
-                JavaType.FullyQualified declaring = methodType.getDeclaringType();
-                if (declaring == null || !DebugRecipeUtils.hasMethod(declaring, "atDebug")) {
-                    return mi;
-                }
-
                 Expression select = mi.getSelect();
                 if (select == null) {
                     return mi;
+                }
+
+                JavaType.Method methodType = mi.getMethodType();
+                if (methodType == null) {
+                    if (!DebugRecipeUtils.isLombokSlf4jAnnotated(this)
+                            || !DebugRecipeUtils.isLombokSlf4jLoggerSelect(select)) {
+                        return mi;
+                    }
+                } else {
+                    if (!DebugRecipeUtils.isSlf4jLogger(methodType)) {
+                        return mi;
+                    }
+
+                    JavaType.FullyQualified declaring = methodType.getDeclaringType();
+                    if (declaring == null || !DebugRecipeUtils.hasMethod(declaring, "atDebug")) {
+                        return mi;
+                    }
                 }
 
                 List<Expression> args = mi.getArguments();
