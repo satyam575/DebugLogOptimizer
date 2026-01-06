@@ -102,6 +102,41 @@ You can also configure the plugin in your target project's `pom.xml`:
 </plugin>
 ```
 
+## Use via JitPack (public GitHub)
+
+1. Make sure the GitHub repo is public.
+2. Tag a release and push it, for example:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+3. In the target project, add the JitPack repository and dependency:
+
+```xml
+<repositories>
+  <repository>
+    <id>jitpack</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+
+<dependencies>
+  <dependency>
+    <groupId>com.github.satyam575</groupId>
+    <artifactId>DebugLogOptimizer</artifactId>
+    <version>v0.1.0</version>
+  </dependency>
+</dependencies>
+```
+
+Then reference the recipe ID, for example:
+
+```
+org.debugBetter.DebugToFluent
+```
+
 ## Use in IntelliJ (OpenRewrite plugin)
 
 1. Install the OpenRewrite plugin in IntelliJ.
